@@ -7,7 +7,7 @@ load_dotenv()
 
 
 class LLMProvider:
-    def __init__(self, model_name: str = "gemini/gemini-flash-latest", api_key: str = None):
+    def __init__(self, model_name: str = "ollama/gemma3:4b", api_key: str = None):
         """
         Initialize the LLM provider.
         
@@ -21,7 +21,7 @@ class LLMProvider:
         self.model_name = model_name
         self.api_key = api_key
 
-    @retry(stop=stop_after_attempt(5), wait=wait_exponential(multiplier=2, min=10, max=60))
+    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=10))
     def generate(self, prompt: str, system_prompt: str = None) -> str:
         """
         Generate text from the LLM.
