@@ -25,11 +25,20 @@ class AbstractBaseTask(ABC):
 
     def mutation_prompt(self, code: str, feedback: str, current_fitness: float) -> str:
         return f"""
-        Improve this code. Current fitness: {current_fitness}.
-        Previous feedback/error: {feedback}
+        You are an Evolutionary Agent. Your goal is to improve the following code.
         
-        Code:
+        Current Fitness: {current_fitness}
+        Previous Feedback: {feedback}
+        
+        CRITICAL INSTRUCTION:
+        1. ANALYZE: Why did the previous code fail or perform poorly?
+        2. HYPOTHESIZE: Propose a SPECIFIC algorithmic change to improve fitness.
+        3. IMPLEMENT: Write the new code.
+        
+        Add your Analysis and Hypothesis as a docstring or comment at the top of the code.
+        
+        Code to Improve:
         {code}
         
-        Return ONLY the improved code.
+        Return ONLY the valid Python code (with your hypothesis in comments).
         """

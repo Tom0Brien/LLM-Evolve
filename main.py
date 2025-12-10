@@ -10,6 +10,7 @@ from src.tasks.registry import get_task, list_tasks as registry_list_tasks
 import src.tasks.sorting
 import src.tasks.sudoku
 import src.tasks.primes
+import src.tasks.compression
 from src.utils.storage import save_result
 
 load_dotenv()

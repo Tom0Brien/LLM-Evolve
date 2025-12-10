@@ -143,6 +143,8 @@ class EvolutionEngine:
                 if self.writer: self.writer.close()
                 # We stop early if perfect
                 return best
+            elif best.fitness == 0.0 and best.feedback:
+                console.print(f"\n[bold red]Best Solution Failed:[/bold red] {best.feedback}")
             
             # 4. Selection & Mutation (if not last gen)
             if gen < generations - 1:
@@ -157,7 +159,8 @@ class EvolutionEngine:
                         mutation_prompt = self.task.mutation_prompt(parent.code, parent.feedback, parent.fitness)
                         
                         try:
-                            new_code = self.llm.generate(mutation_prompt, system_prompt="Improve the code based on feedback.")
+                            # Use a more open system prompt to allow for the reasoning/comments requested
+                            new_code = self.llm.generate(mutation_prompt, system_prompt="You are an expert Python evolutionary coder.")
                             new_population.append(Individual(code=new_code))
                         except Exception:
                             pass 
