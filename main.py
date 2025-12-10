@@ -4,7 +4,10 @@ from dotenv import load_dotenv
 from rich.console import Console
 from src.core.llm import LLMProvider
 from src.core.engine import EvolutionEngine
-from src.tasks.sorting import SortingTask
+from src.tasks.registry import get_task, list_tasks as registry_list_tasks
+# Tasks must be imported to register
+import src.tasks.sorting
+import src.tasks.sudoku
 from src.utils.storage import save_result
 
 load_dotenv()
@@ -13,7 +16,7 @@ console = Console()
 
 @app.command()
 def run(
-    task_name: str = typer.Argument(..., help="Name of the task to run (e.g., 'sorting')"),
+    task_name: str = typer.Argument(..., help="Name of the task to run"),
     generations: int = typer.Option(3, help="Number of generations to evolve"),
     population: int = typer.Option(5, help="Population size"),
     model: str = typer.Option("ollama/gemma3:4b", help="LLM model to use")
@@ -22,10 +25,11 @@ def run(
     Run the AlphaEvolve agent on a specific task.
     """
     # 1. Select Task
-    if task_name.lower() == "sorting":
-        task = SortingTask()
-    else:
+    task = get_task(task_name)
+    
+    if not task:
         console.print(f"[red]Unknown task: {task_name}[/red]")
+        console.print(f"Available tasks: {', '.join(registry_list_tasks())}")
         raise typer.Exit(code=1)
 
     # 2. Setup LLM
@@ -55,7 +59,8 @@ def run(
 def list_tasks():
     """List available tasks."""
     console.print("Available tasks:")
-    console.print("- sorting")
+    for t in registry_list_tasks():
+        console.print(f"- {t}")
 
 if __name__ == "__main__":
     app()

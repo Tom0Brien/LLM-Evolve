@@ -1,5 +1,7 @@
 from src.tasks.base import AbstractBaseTask
+from src.tasks.registry import register_task
 
+@register_task(name_override="sorting")
 class SortingTask(AbstractBaseTask):
     @property
     def name(self) -> str:
