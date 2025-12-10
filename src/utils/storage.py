@@ -6,16 +6,17 @@ from src.core.types import Individual
 
 RESULTS_DIR = Path("results")
 
-def save_result(task_name: str, best_individual: Individual):
+def save_result(best_individual: Individual, output_dir: Path):
     """
-    Save the best individual and metadata to the results directory.
+    Save the best individual and metadata to the specified results directory.
     """
-    timestamp = time.strftime("%Y%m%d_%H%M%S")
-    run_dir = RESULTS_DIR / f"{task_name}_{timestamp}"
-    run_dir.mkdir(parents=True, exist_ok=True)
+    if not isinstance(output_dir, Path):
+        output_dir = Path(output_dir)
+        
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     # Save Code
-    code_path = run_dir / "solution.py"
+    code_path = output_dir / "solution.py"
     with open(code_path, "w", encoding="utf-8") as f:
         f.write(best_individual.code)
 
@@ -23,12 +24,11 @@ def save_result(task_name: str, best_individual: Individual):
     metadata = {
         "fitness": best_individual.fitness,
         "feedback": best_individual.feedback,
-        "timestamp": timestamp,
-        "task": task_name
+        # "task" field removed from arguments, could re-add if needed but keeping signature validation clean
     }
     
-    meta_path = run_dir / "meta.json"
+    meta_path = output_dir / "meta.json"
     with open(meta_path, "w", encoding="utf-8") as f:
         json.dump(metadata, f, indent=4)
     
-    return run_dir
+    return output_dir

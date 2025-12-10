@@ -1,5 +1,6 @@
 import typer
 import os
+import time
 from dotenv import load_dotenv
 from rich.console import Console
 from src.core.llm import LLMProvider
@@ -8,6 +9,7 @@ from src.tasks.registry import get_task, list_tasks as registry_list_tasks
 # Tasks must be imported to register
 import src.tasks.sorting
 import src.tasks.sudoku
+import src.tasks.primes
 from src.utils.storage import save_result
 
 load_dotenv()
@@ -40,17 +42,20 @@ def run(
         raise typer.Exit(code=1)
 
     # 3. Initialize Engine
-    engine = EvolutionEngine(llm=llm, task=task, population_size=population)
+    # Create unique run dir in results/
+    run_dir = f"results/{task_name}_{time.strftime('%Y%m%d_%H%M%S')}"
+    engine = EvolutionEngine(llm=llm, task=task, population_size=population, log_dir=run_dir)
 
     # 4. Evolve
     console.print(f"[bold]Starting evolution for {task.name}...[/bold]")
+    console.print(f"[dim]Output directory: {run_dir}[/dim]")
     best_ind = engine.run(generations=generations)
 
     # 5. Save Results
     if best_ind:
         console.print(f"\n[green]Evolution complete! Best fitness: {best_ind.fitness}[/green]")
-        result_dir = save_result(task_name, best_ind)
-        console.print(f"Results saved to: [bold]{result_dir}[/bold]")
+        saved_path = save_result(best_ind, run_dir)
+        console.print(f"Results saved to: [bold]{saved_path}[/bold]")
         console.print(f"Code:\n{best_ind.code}")
     else:
         console.print("[red]Evolution failed to produce any individuals.[/red]")

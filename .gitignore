@@ -1,6 +1,7 @@
 # Python
 __pycache__/
 results/
+runs/
 *.py[cod]
 *$py.class
 
